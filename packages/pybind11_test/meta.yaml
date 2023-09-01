@@ -1,0 +1,31 @@
+package:
+  name: pybind11_test
+  version: 0.0.1
+  top-level:
+    - pybind11_test
+source:
+  path: src
+
+build:
+  type: cpython_module
+  script: |
+    export EMSCRIPTEN_SYSROOT=$(em-config CACHE)/sysroot
+    export EMSCRIPTEN_INCLUDE=$EMSCRIPTEN_SYSROOT/include
+    export EMSCRIPTEN_BIN=$EMSCRIPTEN_SYSROOT/bin
+    export EMSCRIPTEN_LIB=$EMSCRIPTEN_SYSROOT/lib/wasm32-emscripten/pic
+    git clone https://github.com/pybind/pybind11.git
+
+    mkdir -p build
+    cd build && emcmake cmake .. \
+      -DPython3_ROOT_DIR=$TARGETINSTALLDIR \
+      -DPython3_LIBRARY=$TARGETINSTALLDIR/lib/libpython3.11.a \
+      -DPython3_INCLUDE_DIR=$TARGETINSTALLDIR/include/python3.11 \
+      -DPYTHON_INCLUDE_DIRS=$TARGETINSTALLDIR/include/python3.11 \
+      -DPYTHON_LIBRARIES=$TARGETINSTALLDIR/lib/libpython3.11.a \
+      -DCMAKE_STRIP=/home/matthias/src/misc/pyodide/emsdk/emsdk/upstream/emscripten/emstrip \
+      -DCMAKE_INSTALL_PREFIX=$WASM_LIBRARY_DIR \
+      -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+
+    emmake make VERBOSE=1 -j ${PYODIDE_JOBS:-3}
+
+    cp ./*.so ${DISTDIR}

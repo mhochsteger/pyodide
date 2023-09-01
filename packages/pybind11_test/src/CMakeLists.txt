@@ -1,0 +1,11 @@
+cmake_minimum_required(VERSION 3.18)
+project(pybind11_test)
+
+add_subdirectory(pybind11)
+set(PYTHON_MODULE_EXTENSION ".so")
+pybind11_add_module(pybind11_test main.cpp)
+target_link_options(pybind11_test PUBLIC -sALLOW_MEMORY_GROWTH -sENVIRONMENT=web)
+target_compile_options(pybind11_test PUBLIC -O0 -sSIDE_MODULE=1)
+target_compile_options(pybind11_test PUBLIC -sNO_DISABLE_EXCEPTION_CATCHING)
+target_link_options(pybind11_test PUBLIC -sNO_DISABLE_EXCEPTION_CATCHING)
+target_link_options(pybind11_test PUBLIC -O0 -sSIDE_MODULE=1 -sEXPORT_ALL=1)
